@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { api } from '../services/apiClient'
 import {
   createSearch,
@@ -42,7 +42,6 @@ export default function CustomerSearchPage({ embedded = false }) {
     const cachedSearch = localStorage.getItem(searchStorageKey)
 
     if (!cachedSearch) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       searchCustomers(0, true, createSearch(defaultSortBy))
       return
     }

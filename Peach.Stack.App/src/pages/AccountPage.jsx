@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import 'qrpeach'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { toast } from 'react-toastify'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useAuth } from '../context/AuthContext'

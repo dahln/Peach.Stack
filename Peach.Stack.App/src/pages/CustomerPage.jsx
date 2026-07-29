@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router'
 import { toast } from 'react-toastify'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { api } from '../services/apiClient'
@@ -42,7 +42,6 @@ export default function CustomerPage() {
 
   useEffect(() => {
     if (!id) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCustomer(createEmptyCustomer())
       setIsLocked(false)
       return

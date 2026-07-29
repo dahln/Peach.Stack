@@ -1,6 +1,6 @@
 import './AppLayout.css'
 import { ToastContainer } from 'react-toastify'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import LoadingOverlay from './LoadingOverlay'
 import TopNavigation from './TopNavigation'
 
