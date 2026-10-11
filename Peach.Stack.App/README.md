@@ -1,5 +1,15 @@
 # React + Vite
 
+## Sign-out
+
+The navigation sign-out action invalidates the authentication cookie and checks
+`/api/manage/info` before redirecting to `/login?signedOut=true`. Only a `401`
+from that session endpoint confirms sign-out; network and server errors do not.
+The login page displays the signed-out confirmation only when the URL parameter
+is `signedOut=true` and the session has been verified as unauthenticated. This
+also applies when reloading the login page. The former logout page and route
+have been removed.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

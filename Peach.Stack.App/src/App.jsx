@@ -11,7 +11,6 @@ import ConfirmEmailResendPage from './pages/ConfirmEmailResendPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
-import LogoutPage from './pages/LogoutPage'
 import RegisterPage from './pages/RegisterPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import CustomerPage from './pages/CustomerPage'
@@ -51,7 +50,6 @@ function App() {
             {/* -- Authentication -------------------------------------------- */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/logout" element={<LogoutPage />} />
 
             {/* -- Account / Email / Password -------------------------------- */}
             <Route path="/confirmingEmail" element={<ConfirmEmailPage />} />

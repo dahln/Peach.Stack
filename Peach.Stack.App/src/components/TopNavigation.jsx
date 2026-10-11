@@ -1,6 +1,7 @@
 import './TopNavigation.css'
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuth } from '../context/AuthContext'
 import PeachStackLogo from './PeachStackLogo'
 
@@ -48,6 +49,24 @@ export default function TopNavigation() {
 
   // Auth state: tells us whether the user is logged in, their role, and features.
   const authContext = useAuth()
+  const navigate = useNavigate()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
+  async function handleSignOut() {
+    if (isSigningOut) {
+      return
+    }
+
+    setIsSigningOut(true)
+    try {
+      await authContext.logout()
+      navigate('/login?signedOut=true', { replace: true })
+    } catch (caughtError) {
+      toast.error(caughtError.message || 'Unable to sign out. Please try again.')
+    } finally {
+      setIsSigningOut(false)
+    }
+  }
 
   // Active theme ('light' | 'dark').
   const [theme, setTheme] = useState(readInitialTheme)
@@ -122,10 +141,16 @@ export default function TopNavigation() {
           {authContext.user?.email}
         </Link>
 
-        <Link to="/logout" className="nav-link text-white d-inline-flex align-items-center">
+        <button
+          type="button"
+          className="nav-link text-white d-inline-flex align-items-center"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+        >
           <i className="bi bi-box-arrow-right me-2 flex-shrink-0 text-danger" />
-          Log out
-        </Link>
+          {isSigningOut && 'Logging you out...'}
+          {!isSigningOut && 'Log out'}
+        </button>
       </>
     )
   }

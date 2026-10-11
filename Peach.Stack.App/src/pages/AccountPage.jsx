@@ -345,8 +345,8 @@ export default function AccountPage() {
   // --- Account Deletion -----------------------------------------------------
 
   /**
-   * Permanently deletes the user's account, logs them out, refreshes the auth
-   * context, and redirects to the home page.
+   * Permanently deletes the user's account, verifies sign-out, and redirects
+   * to the login page.
    */
   async function deleteAccount() {
     const response = await api.delete('v1/account')
@@ -354,15 +354,12 @@ export default function AccountPage() {
       return
     }
 
-    // Invalidate the server session
-    await api.get('v1/account/logout', {
-      redirectOnUnauthorized: false,
-      showToast: false,
-    })
-
-    // Clear the client-side auth state and send the user home
-    await auth.refreshAuth()
-    navigate('/', { replace: true })
+    try {
+      await auth.logout()
+      navigate('/login?signedOut=true', { replace: true })
+    } catch (caughtError) {
+      toast.error(caughtError.message || 'Unable to verify sign-out. Please try again.')
+    }
   }
 
   // --- Render ---------------------------------------------------------------

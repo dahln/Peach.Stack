@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../services/apiClient'
@@ -20,6 +20,12 @@ import { api } from '../services/apiClient'
 export default function LoginPage({ embedded = false }) {
   const auth = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const showSignedOutMessage =
+    searchParams.get('signedOut') === 'true' &&
+    !auth.isLoading &&
+    auth.isSessionVerified &&
+    !auth.isAuthenticated
 
   // --- State ----------------------------------------------------------------
 
@@ -186,6 +192,12 @@ export default function LoginPage({ embedded = false }) {
           </div>
 
           <div className="card-body">
+            {showSignedOutMessage && (
+              <div className="alert alert-success" role="alert">
+                You are logged out.
+              </div>
+            )}
+
             {/* Validation errors collected during submit */}
             {errorList.map((errorMessage) => (
               <div key={errorMessage} className="alert alert-danger" role="alert">

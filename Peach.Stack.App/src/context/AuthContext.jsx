@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from '../services/apiClient'
+import { getSessionInfo } from '../services/authSession'
+import { toast } from 'react-toastify'
 
 // --- Context Setup ------------------------------------------------------------
 
@@ -16,7 +18,7 @@ const AuthContext = createContext(null)
  * call it both as the useState initialiser and as the value to set on logout,
  * guaranteeing the same shape every time.
  *
- * @returns {{ isAuthenticated: false, isAdmin: false, roles: [], user: null }}
+ * @returns {{ isAuthenticated: false, isAdmin: false, roles: [], user: null, isSessionVerified: false }}
  */
 function createUnauthenticatedState() {
   return {
@@ -24,6 +26,7 @@ function createUnauthenticatedState() {
     isAdmin: false,
     roles: [],
     user: null,
+    isSessionVerified: false,
   }
 }
 
@@ -52,14 +55,14 @@ export function AuthProvider({ children }) {
   // --- Auth State Refresh -----------------------------------------------------
 
   /**
-  * Fetches the latest auth information from the server (user info and roles)
-  * and updates the auth state accordingly.
+   * Fetches the latest auth information from the server (user info and roles)
+   * and updates the auth state accordingly.
    *
    * This is called automatically on mount and can also be called manually after
    * any operation that changes the session (e.g. after enabling 2FA, changing
    * email, etc.) to ensure the in-memory auth state stays in sync.
    *
-  * Both API calls are made in parallel via Promise.all for speed.
+   * Only a 401 from the session endpoint confirms that the user is signed out.
    *
    * @returns {Promise<Object>} The new auth state that was stored in React state.
    */
@@ -67,24 +70,20 @@ export function AuthProvider({ children }) {
     setIsLoadingAuthState(true)
 
     try {
-      // Fire all three requests simultaneously  -  they are independent of each other.
-      const [userInfo, userRoles] = await Promise.all([
-        api.get('manage/info', {
-          redirectOnUnauthorized: false, // don't redirect to "/" on 401  -  just mark as logged out
-          showToast: false, // silent; we handle the unauthenticated case ourselves
-        }),
-        api.get('v1/account/roles', {
-          redirectOnUnauthorized: false,
-          showToast: false,
-        }),
-      ])
+      const userInfo = await getSessionInfo()
 
       // If userInfo is null the session cookie is absent or expired.
       if (!userInfo) {
         const unauthenticatedState = createUnauthenticatedState()
+        unauthenticatedState.isSessionVerified = true
         setAuthState(unauthenticatedState)
         return unauthenticatedState
       }
+
+      const userRoles = await api.get('v1/account/roles', {
+        redirectOnUnauthorized: false,
+        showToast: false,
+      })
 
       // Build the new auth state from the API responses.
       let resolvedRoles = []
@@ -94,6 +93,7 @@ export function AuthProvider({ children }) {
 
       const newAuthState = {
         isAuthenticated: true,
+        isSessionVerified: true,
         isAdmin: Array.isArray(userRoles) && userRoles.includes('Administrator'),
         roles: resolvedRoles,
         user: {
@@ -105,8 +105,7 @@ export function AuthProvider({ children }) {
       setAuthState(newAuthState)
       return newAuthState
     } catch {
-      // Treat any unexpected error (e.g. network failure) as unauthenticated
-      // so the app is still usable (it will show the login page).
+      toast.error('Unable to verify your session. Please try again.')
       const unauthenticatedState = createUnauthenticatedState()
       setAuthState(unauthenticatedState)
       return unauthenticatedState
@@ -231,9 +230,7 @@ export function AuthProvider({ children }) {
 
   /**
    * Logs the current user out by calling the server-side logout endpoint
-   * (which invalidates the session cookie) and then clears the local auth state.
-   * The finally block guarantees the local state is cleared even if the API
-   * call fails (e.g. already expired session).
+   * and verifies that the server session is gone before clearing local state.
    *
    * @returns {Promise<void>}
    */
@@ -243,16 +240,26 @@ export function AuthProvider({ children }) {
         redirectOnUnauthorized: false,
         showToast: false,
       })
-    } finally {
-      try {
-        localStorage.clear()
-      } catch {
-        // Clearing persisted client state is best-effort only.
+    } catch (caughtError) {
+      if (!(caughtError instanceof ApiError) || caughtError.status !== 401) {
+        throw caughtError
       }
-
-      // Always clear local auth state, even if the server request fails.
-      setAuthState(createUnauthenticatedState())
     }
+
+    const userInfo = await getSessionInfo()
+    if (userInfo) {
+      throw new Error('Your session is still active. Please try signing out again.')
+    }
+
+    try {
+      localStorage.clear()
+    } catch {
+      toast.error('You are signed out, but saved browser data could not be cleared.')
+    }
+
+    const unauthenticatedState = createUnauthenticatedState()
+    unauthenticatedState.isSessionVerified = true
+    setAuthState(unauthenticatedState)
   }, [])
 
   // --- Context Value ----------------------------------------------------------
