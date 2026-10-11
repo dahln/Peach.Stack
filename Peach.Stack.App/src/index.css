@@ -197,8 +197,7 @@ a:visited {
   .docs-print-content .preview-pane pre,
   .docs-print-content .preview-pane blockquote,
   .docs-print-content .preview-pane table,
-  .docs-print-content .preview-pane img,
-  .docs-print-content .preview-pane .mermaid-diagram {
+  .docs-print-content .preview-pane img {
     break-inside: avoid;
     page-break-inside: avoid;
   }
