@@ -38,7 +38,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "prettier": "^3.6.2",
-    "vite": "^8.0.8"
+    "vite": "^8.3.5"
   },
   "overrides": {
     "uuid": "14.0.0"
