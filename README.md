@@ -7,7 +7,7 @@
 
 ## Overview
 
-Peach.Stack is an opinionated .NET 10 + React starter template using a **decoupled proxy** architecture. This template includes all the things that I include in most of my projects - I created this template to streamline project creation for new projects and ideas.
+Peach.Stack is an opinionated .NET 11 + React starter template using a **decoupled proxy** architecture. This template includes all the things that I include in most of my projects - I created this template to streamline project creation for new projects and ideas.
 
 The project, namespaces, folder, etc. use the 'Peach.Stack' naming convention - if you want to change this you can do a search and replace, or have Copilot do it; both approaches have worked for me.
 
@@ -34,7 +34,7 @@ Note: The API and frontend run as independent processes during development and a
 
 ## Technologies
 
-- .NET 10
+- .NET 11
 - ASP.NET Core Web API
 - React + Vite
 - ASP.NET Core Identity with cookie auth and 2FA support

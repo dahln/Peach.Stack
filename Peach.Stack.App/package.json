@@ -42,5 +42,8 @@
   },
   "overrides": {
     "uuid": "14.0.0"
+  },
+  "allowScripts": {
+    "fsevents": false
   }
 }
