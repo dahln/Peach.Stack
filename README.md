@@ -30,7 +30,7 @@ Peaches are delicious. And cheeky.
 
 Note: The API and frontend run as independent processes during development and are deployed as separate applications behind Nginx in production.
 
-![Diagram](https://github.com/dahln/Peach.Stack/blob/67482b6cf7ea80b9575979a9e911c60ba8ed9585/Diagram.png)
+![Diagram](https://github.com/dahln/Peach.Stack/blob/67482b6cf7ea80b9575979a9e911c60ba8ed9585/Diagram.jpeg)
 
 ## Technologies
 
